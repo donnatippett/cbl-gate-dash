@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gate Display Dashboard</title>
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-H8MRBMBBP3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-H8MRBMBBP3');
+  </script>
+
+  <style>
+    body {
+      background-color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 5px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #CC0000;
+      font-size: 60px;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      font-size: 35px;
+      margin-top: 5px;
+      margin-bottom: 20px;
+    }
+
+    /* ✅ Responsive grid: auto-fits 1/2/3 columns without browser zoom */
+    .dashboard{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 30px;
+      justify-items: center;
+      align-items: start;
+      max-width: 1800px;
+      margin: 0 auto;
+      margin-bottom: 0;
+    }
+
+    .gate-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* ✅ Card scales down on smaller screens, keeps your original proportion */
+    .gate-block{
+      background-color: black;
+      color: #F5A623;
+      width: min(580px, 100%);
+      height: 250px; /* keep original height so panels feel like the real signs */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      border: 10px solid #591010;
+      box-sizing: border-box;
+    }
+
+    .gate-banner {
+      background-color: #FFD700;
+      color: black;
+      font-family: "Times New Roman", serif;
+      font-weight: bold;
+      font-size: clamp(28px, 3vw, 42px);
+      padding: 10px;
+    }
+
+    .panel-stack {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* ✅ Panels share space evenly (more reliable than 48% when gap is fixed) */
+    .top-panel,
+    .bottom-panel{
+      flex: 1 1 auto;
+      background-color: black;
+      color: #F5A623;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      white-space: pre-wrap;
+      box-sizing: border-box;
+    }
+
+    .top-panel{
+      font-size: clamp(20px, 2vw, 29px);
+      padding: 14px 10px; /* slightly more breathing room */
+    }
+
+    /* ✅ Extra bottom padding creates space between date and border */
+    .bottom-panel{
+      font-size: clamp(20px, 2vw, 28px);
+      padding: 16px 10px 22px; /* extra bottom padding */
+    }
+
+    .bottom-panel div {
+      font-size: inherit !important;
+    }
+
+    /* ✅ Restore the “physical” divider gap between top/bottom panels */
+    .spacer-panel{
+      flex: 0 0 14px;     /* requested gap */
+      background-color: white;
+    }
+
+    .expires {
+      font-size: 14px;
+      color: red;
+      margin-top: 10px;
+    }
+
+    .dashboard-update {
+      text-align: left;
+      margin-left: 10px;
+      margin-top: 18px; /* keeps note from crowding bottom row */
+    }
+
+    /* ✅ Small screens */
+    @media (max-width: 420px) {
+      h1 { font-size: 42px; }
+      h2 { font-size: 22px; }
+      .dashboard { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>GATE DISPLAY DASHBOARD</h1>
+  <h2>Refresh Screen to View Latest Messages</h2>
+
+  <div class="dashboard" id="dashboard"></div>
+
+  <!-- Keep version/date note (unchanged) -->
+  <p class="dashboard-update">
+    <em>Public Dashboard - Updated 12/28/25 v6.19-1.</em>
+  </p>
+
+  <script>
+    const gates = ['Gate 1', 'Gate 2', 'Gate 3', 'Gate 4', 'Gate 4A', 'Gate 5'];
+    const BASE_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzS8zHvuWJwDvKXNQnkWFbzMEQoA1O_d-zstle1NRRqIMBQaFGTd9FN-SzEAbnkgEQP/exec";
+
+    async function createGateBlock(gate) {
+      const container = document.createElement("div");
+      container.className = "gate-container";
+
+      const block = document.createElement("div");
+      block.className = "gate-block";
+
+      const banner = document.createElement("div");
+      banner.className = "gate-banner";
+      banner.innerText = gate.toUpperCase();
+      block.appendChild(banner);
+
+      const panelStack = document.createElement("div");
+      panelStack.className = "panel-stack";
+
+      const topPanel = document.createElement("div");
+      topPanel.className = "top-panel";
+      topPanel.innerHTML = "Loading...";
+
+      const spacerPanel = document.createElement("div");
+      spacerPanel.className = "spacer-panel";
+
+      const bottomPanel = document.createElement("div");
+      bottomPanel.className = "bottom-panel";
+      bottomPanel.innerHTML = "";
+
+      panelStack.appendChild(topPanel);
+      panelStack.appendChild(spacerPanel);
+      panelStack.appendChild(bottomPanel);
+      block.appendChild(panelStack);
+
+      const expiresDiv = document.createElement("div");
+      expiresDiv.className = "expires";
+      expiresDiv.innerText = "";
+
+      container.appendChild(block);
+      container.appendChild(expiresDiv);
+      document.getElementById("dashboard").appendChild(container);
+
+      async function fetchSlides() {
+        try {
+          const topRes = await fetch(`${BASE_WEBAPP_URL}?gate=${encodeURIComponent(gate)}&section=top&format=json`);
+          const topData = await topRes.json();
+          const topSlides = Object.entries(topData)
+            .filter(([key]) => key.startsWith("slide"))
+            .map(([, value]) => String(value));
+
+          let topIndex = 0;
+          topPanel.innerHTML = topSlides[topIndex] || "Welcome to<br/>Casco Bay Lines";
+
+          if (topSlides.length > 1) {
+            setInterval(() => {
+              topIndex = (topIndex + 1) % topSlides.length;
+              topPanel.innerHTML = topSlides[topIndex];
+            }, 6000);
+          }
+
+          const bottomRes = await fetch(`${BASE_WEBAPP_URL}?gate=${encodeURIComponent(gate)}&section=bottom&format=json`);
+          const bottomData = await bottomRes.json();
+          const bottomSlides = Object.values(bottomData).filter(s => typeof s === 'string');
+
+          let bottomIndex = 0;
+          bottomPanel.innerHTML = bottomSlides[bottomIndex] || "";
+
+          if (bottomSlides.length > 1) {
+            setInterval(() => {
+              bottomIndex = (bottomIndex + 1) % bottomSlides.length;
+              bottomPanel.innerHTML = bottomSlides[bottomIndex];
+            }, 6000);
+          }
+
+          if (topData.alertTimestamp) {
+            const alertTime = new Date(topData.alertTimestamp);
+            const expiresTime = new Date(alertTime.getTime() + 35 * 60000);
+            const expiresStr = expiresTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            expiresDiv.innerText = `Gate Alert expires at: ${expiresStr}`;
+          } else {
+            expiresDiv.innerText = "";
+          }
+
+        } catch (err) {
+          console.error(`Error fetching slides for ${gate}:`, err);
+          topPanel.innerHTML = "Welcome to<br/>Casco Bay Lines";
+          bottomPanel.innerHTML = "";
+          expiresDiv.innerText = "";
+        }
+      }
+
+      fetchSlides();
+      setInterval(fetchSlides, 60000);
+    }
+
+    gates.forEach(createGateBlock);
+  </script>
+</body>
+</html>
