@@ -36,7 +36,7 @@
       margin-bottom: 20px;
     }
 
-    /* ✅ Responsive grid: auto-fits 1/2/3+ columns without browser zoom */
+    /* ✅ Responsive grid: auto-fits 1/2/3 columns without browser zoom */
     .dashboard{
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
@@ -55,13 +55,12 @@
       width: 100%;
     }
 
-    /* ✅ Card scales down on smaller screens, but never exceeds 580px */
+    /* ✅ Card scales down on smaller screens, keeps your original proportion */
     .gate-block{
       background-color: black;
       color: #F5A623;
       width: min(580px, 100%);
-      height: auto;          /* allow it to breathe */
-      min-height: 250px;     /* preserves original look */
+      height: 250px; /* keep original height so panels feel like the real signs */
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -70,7 +69,6 @@
       box-sizing: border-box;
     }
 
-    /* ✅ Optional responsive fonts */
     .gate-banner {
       background-color: #FFD700;
       color: black;
@@ -84,43 +82,39 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      min-height: 180px;
     }
 
-    /* ✅ Slightly more padding so text doesn't hug edges */
-    .top-panel {
-      flex: 0 0 48%;
+    /* ✅ Panels share space evenly (more reliable than 48% when gap is fixed) */
+    .top-panel,
+    .bottom-panel{
+      flex: 1 1 auto;
       background-color: black;
       color: #F5A623;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      white-space: pre-wrap;
+      box-sizing: border-box;
+    }
+
+    .top-panel{
       font-size: clamp(20px, 2vw, 29px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 14px 10px;     /* was 10px */
-      white-space: pre-wrap;
-      box-sizing: border-box;
+      padding: 14px 10px; /* slightly more breathing room */
     }
 
-    /* ✅ Extra bottom padding creates space between date text and border */
-    .bottom-panel {
-      flex: 0 0 48%;
-      background-color: black;
-      color: #F5A623;
+    /* ✅ Extra bottom padding creates space between date and border */
+    .bottom-panel{
       font-size: clamp(20px, 2vw, 28px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
       padding: 16px 10px 22px; /* extra bottom padding */
-      white-space: pre-wrap;
-      box-sizing: border-box;
     }
 
     .bottom-panel div {
       font-size: inherit !important;
     }
 
-    .spacer-panel {
-      flex: 0 0 4%;
+    /* ✅ Restore the “physical” divider gap between top/bottom panels */
+    .spacer-panel{
+      flex: 0 0 14px;     /* requested gap */
       background-color: white;
     }
 
@@ -130,14 +124,13 @@
       margin-top: 10px;
     }
 
-    /* ✅ Prevent footer note from crowding last row */
     .dashboard-update {
       text-align: left;
       margin-left: 10px;
-      margin-top: 18px; /* added */
+      margin-top: 18px; /* keeps note from crowding bottom row */
     }
 
-    /* ✅ Keep things usable on very small screens */
+    /* ✅ Small screens */
     @media (max-width: 420px) {
       h1 { font-size: 42px; }
       h2 { font-size: 22px; }
