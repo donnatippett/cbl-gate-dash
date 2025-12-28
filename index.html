@@ -36,14 +36,14 @@
       margin-bottom: 20px;
     }
 
-    /* ✅ Responsive grid: auto-fits 1/2/3 columns without browser zoom */
+    /* ✅ Force 3 columns on desktop/workstations (3 top + 3 bottom) */
     .dashboard{
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 30px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 30px;                 /* replaces column-gap/row-gap */
       justify-items: center;
       align-items: start;
-      max-width: 1800px;
+      max-width: 1900px;
       margin: 0 auto;
       margin-bottom: 0;
     }
@@ -55,12 +55,12 @@
       width: 100%;
     }
 
-    /* ✅ Card scales down on smaller screens, keeps your original proportion */
+    /* ✅ Keep the sign proportions, allow it to shrink nicely */
     .gate-block{
       background-color: black;
       color: #F5A623;
       width: min(580px, 100%);
-      height: 250px; /* keep original height so panels feel like the real signs */
+      height: 250px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -74,7 +74,7 @@
       color: black;
       font-family: "Times New Roman", serif;
       font-weight: bold;
-      font-size: clamp(28px, 3vw, 42px);
+      font-size: 42px;
       padding: 10px;
     }
 
@@ -84,7 +84,7 @@
       height: 100%;
     }
 
-    /* ✅ Panels share space evenly (more reliable than 48% when gap is fixed) */
+    /* ✅ Panels share space evenly */
     .top-panel,
     .bottom-panel{
       flex: 1 1 auto;
@@ -97,24 +97,25 @@
       box-sizing: border-box;
     }
 
+    /* ✅ Slightly more breathing room */
     .top-panel{
-      font-size: clamp(20px, 2vw, 29px);
-      padding: 14px 10px; /* slightly more breathing room */
+      font-size: 29px;
+      padding: 14px 10px;        /* was 10px */
     }
 
-    /* ✅ Extra bottom padding creates space between date and border */
+    /* ✅ Extra bottom padding to create space under date */
     .bottom-panel{
-      font-size: clamp(20px, 2vw, 28px);
-      padding: 16px 10px 22px; /* extra bottom padding */
+      font-size: 28px;
+      padding: 16px 10px 22px;   /* was 10px */
     }
 
     .bottom-panel div {
       font-size: inherit !important;
     }
 
-    /* ✅ Restore the “physical” divider gap between top/bottom panels */
+    /* ✅ Restore “physical” gap between top & bottom panels */
     .spacer-panel{
-      flex: 0 0 14px;     /* requested gap */
+      flex: 0 0 14px;            /* fixed gap (requested) */
       background-color: white;
     }
 
@@ -127,14 +128,23 @@
     .dashboard-update {
       text-align: left;
       margin-left: 10px;
-      margin-top: 18px; /* keeps note from crowding bottom row */
+      margin-top: 18px;          /* adds space from last row */
     }
 
-    /* ✅ Small screens */
+    /* ✅ 2 columns on medium screens (smaller laptops/tablets) */
+    @media (max-width: 1350px) {
+      .dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* ✅ 1 column on phones */
+    @media (max-width: 768px) {
+      .dashboard { grid-template-columns: 1fr; }
+    }
+
+    /* Optional: tighten headings on very small phones */
     @media (max-width: 420px) {
       h1 { font-size: 42px; }
       h2 { font-size: 22px; }
-      .dashboard { grid-template-columns: 1fr; }
     }
   </style>
 </head>
